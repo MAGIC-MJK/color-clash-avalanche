@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Clash</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand"><span class="brand-mark">CC</span><div><strong>COLOR CLASH</strong><small data-i18n="tagline">漫画风卡牌对战</small></div></div>
+        <div class="header-actions">
+            <label class="language-control" for="language"><span aria-hidden="true">🌐</span><span class="sr-only" data-i18n="language">语言</span><select id="language" aria-label="Language"><option value="zh">简体中文</option><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option></select></label>
+        </div>
+    </header>
+    <div id="wallet-bar">
+        <button id="toggle-music" type="button" aria-pressed="false">♫ 开启音乐</button>
+        <button id="toggle-sfx" type="button" aria-pressed="true">🔊 音效开</button>
+        <button id="open-shop" type="button" data-i18n="shopButton">✦ 商店</button>
+        <span class="chain-mark">Avalanche</span>
+        <button id="connect-wallet" data-i18n="connectWallet">连接钱包</button>
+        <span id="wallet-status" data-i18n="noWallet">未连接钱包 · 游玩无需钱包</span>
+    </div>
+    <audio id="background-music" src="/audio/flowerbed-fields.ogg" loop preload="none"></audio>
+    <div id="lobby">
+        <div class="home-layout">
+            <aside class="home-profile">
+                <div class="home-panel-label" data-i18n="homeProfile">我的角色</div>
+                <button id="edit-avatar" type="button"><img id="lobby-avatar" alt="" /><span data-i18n="createAvatar">设计我的像素角色</span></button>
+                <details id="match-history"><summary><span data-i18n="matchHistory">比赛记录</span><span id="history-summary"></span></summary><div id="history-list"></div></details>
+                <div class="music-visualizer"><div class="music-visualizer-title" data-i18n="musicVisualizer">音乐律动</div><div class="visualizer-screen"><canvas id="music-visualizer" width="440" height="220" aria-label="Audio spectrum"></canvas><span class="visualizer-coin" aria-hidden="true">CC</span></div></div>
+            </aside>
+            <main class="home-main">
+                <div class="lobby-kicker" data-i18n="lobbyKicker">准备开局</div>
+                <h2 data-i18n="lobbyTitle">选择玩法</h2>
+                <p class="lobby-description" data-i18n="lobbyDescription">和朋友、陌生玩家，或电脑对战。</p>
+                <button id="home-shop" class="home-shop-button" type="button" data-i18n="shopButton">✦ 商店</button>
+                <div id="join-form-container">
+                    <div><input type="text" id="name" placeholder="输入昵称" data-i18n-placeholder="namePlaceholder"></div>
+                    <button id="quick-match" type="button" data-i18n="quickMatch">快速匹配 · 4 人桌</button>
+                    <button id="solo" data-i18n="solo">开始单人游戏 · 3 位电脑玩家</button>
+                    <div class="home-room-entry"><input type="text" id="lobby-id" placeholder="房间号（留空创建房间）" data-i18n-placeholder="roomPlaceholder"><button id="join" data-i18n="join">加入多人游戏</button></div>
+                    <div id="queue-panel" hidden role="status"><span id="queue-status"></span> <button id="cancel-match" type="button" data-i18n="cancelMatch">取消匹配</button></div>
+                </div>
+                <div id="lobby-info" style="display: none;">
+                    <h3><span data-i18n="room">房间</span> <span id="current-lobby-id"></span></h3>
+                    <small id="room-creator"></small>
+                    <p data-i18n="shareRoom">把房间号发给朋友，等大家准备好即可开始。</p>
+                </div>
+                <ul id="players"></ul>
+                <button id="ready" data-i18n="ready">准备</button>
+            </main>
+            <aside class="home-records">
+                <div id="result-panel" style="display: none;" role="status" aria-live="polite">
+                    <button id="result-dismiss" type="button" aria-label="关闭结果">×</button>
+                    <h2 id="result-title"></h2>
+                    <p id="result-status"></p>
+                    <div id="scoreboard"><strong data-i18n="scoreHeader">本局 / 累计负分</strong><div id="score-rows"></div></div>
+                    <button id="confirm-result" data-i18n="confirmResult">在 Avalanche 上确认赛果</button>
+                    <a id="result-link" target="_blank" rel="noopener noreferrer" style="display: none;" data-i18n="viewTransaction">查看交易</a>
+                </div>
+                <div class="home-panel-label" data-i18n="homeRecords">战绩大厅</div>
+                <details id="wallet-history"><summary data-i18n="walletHistory">钱包战绩</summary><div id="wallet-history-list"></div></details>
+                <details id="leaderboard"><summary data-i18n="leaderboard">排行榜</summary><div id="leaderboard-list"></div></details>
+                <button id="collection-open" class="collection-shelf" type="button" aria-haspopup="dialog" aria-controls="shop-dialog">
+                    <span class="collection-heading" data-i18n="collectionTitle">我的收藏</span>
+                    <span class="collection-display"><img id="collection-card-back" src="/art/card-backs/classic.png" alt="" /><span class="collection-meta"><strong id="collection-back-name">四色酒馆</strong><span id="collection-coins">连接钱包查看金币</span><small data-i18n="collectionOpen">查看牌背与服装 ›</small></span></span>
+                </button>
+            </aside>
+        </div>
+    </div>
+    <div id="game" style="display: none;">
+        <div class="ambient-embers" aria-hidden="true"></div>
+        <button id="game-menu-button" type="button" aria-haspopup="dialog" aria-controls="game-menu-dialog" data-i18n="gameMenu">☰ 菜单</button>
+        <div id="turn-indicator">
+            <h3 id="turn-text">Waiting for game to start...</h3>
+            <div class="turn-details"><span id="turn-direction" aria-live="polite"></span><span id="turn-clock" role="timer"></span></div>
+        </div>
+        <div id="last-action" role="status" aria-live="polite"></div>
+        <div id="wild4-panel" hidden role="status"><span data-i18n="wild4Prompt">有人打出了 +4，你要接受还是质疑？</span><button id="accept-wild4" type="button" data-i18n="acceptWild4">接受，摸 4 张</button><button id="challenge-wild4" type="button" data-i18n="challengeWild4">质疑 +4</button></div>
+        <div id="opponent-hands"></div>
+        <div id="center-area">
+            <div class="draw-stack"><div class="card-back" aria-hidden="true"><span>CC</span></div><button id="draw-card" data-i18n="draw">摸一张</button><button id="pass-turn" data-i18n="passTurn" hidden>保留这张牌</button><button id="call-uno" hidden>UNO!</button><button id="catch-uno" data-i18n="catchUno" hidden>举报漏喊 UNO</button></div>
+            <div id="discard-pile"></div>
+            <div id="wild-color-picker" style="display: none;">
+                <h4 data-i18n="chooseColor">选择颜色</h4>
+                <div id="color-options">
+                    <button class="color-option" data-color="red" style="background-color: #df332b;" aria-label="Red"></button>
+                    <button class="color-option" data-color="yellow" style="background-color: #ffc846;" aria-label="Yellow"></button>
+                    <button class="color-option" data-color="green" style="background-color: #31a667;" aria-label="Green"></button>
+                    <button class="color-option" data-color="blue" style="background-color: #247bc4;" aria-label="Blue"></button>
+                </div>
+            </div>
+        </div>
+        <div class="hand-zone"><div class="hand-label"><img id="my-avatar" alt="" /><img id="my-card-back" alt="" /><span data-i18n="yourHand">你的手牌</span></div><div id="player-hand"></div></div>
+    </div>
+    <dialog id="game-menu-dialog" aria-labelledby="game-menu-title">
+        <div class="game-menu-top"><small>COLOR CLASH</small><button id="game-menu-close" type="button" aria-label="Close">×</button></div>
+        <h2 id="game-menu-title" data-i18n="gameMenuTitle">对局菜单</h2>
+        <p class="game-menu-note" data-i18n="gameMenuNote">回合计时仍会继续。</p>
+        <div id="game-menu-actions"><button id="game-menu-resume" type="button" data-i18n="continueGame">继续对局</button><button id="game-menu-exit" type="button" data-i18n="backHome">返回首页</button></div>
+        <div id="game-menu-confirm" hidden><p data-i18n="exitGameWarning">离开将中断本局，且无法上链记录这局赛果。确定返回首页吗？</p><div><button id="game-menu-cancel" type="button" data-i18n="stayGame">留在牌桌</button><button id="game-menu-confirm-exit" type="button" data-i18n="confirmExit">确认离开</button></div></div>
+    </dialog>
+    <dialog id="shop-dialog" aria-labelledby="shop-title">
+        <div class="shop-header"><div><small>COLOR CLASH</small><h2 id="shop-title" data-i18n="shopTitle">收藏商店</h2></div><button id="shop-close" type="button" aria-label="Close">×</button></div>
+        <p id="shop-balance"></p>
+        <p class="shop-note" data-i18n="shopNote">开局前连接钱包：完成一局得 20 金币，获胜额外得 10 金币，收藏可跨设备保存。</p>
+        <div class="shop-tabs" role="group" aria-label="Shop categories"><button type="button" data-shop-filter="all" data-i18n="shopAll" aria-pressed="true">全部</button><button type="button" data-shop-filter="back" data-i18n="shopBack" aria-pressed="false">牌背</button><button type="button" data-shop-filter="outfit" data-i18n="shopOutfit" aria-pressed="false">角色服装</button></div>
+        <div id="shop-items"></div>
+        <p id="shop-message" role="status"></p>
+    </dialog>
+    <dialog id="avatar-editor" aria-labelledby="avatar-title">
+        <div class="avatar-editor-header"><div><small>COLOR CLASH</small><h2 id="avatar-title" data-i18n="avatarTitle">设计你的像素角色</h2></div><button id="avatar-close" type="button" aria-label="Close">×</button></div>
+        <div class="avatar-editor-body"><div class="avatar-preview-column"><div class="avatar-preview-frame"><img id="avatar-preview" alt="Pixel hero preview" /></div><div class="avatar-presets"><button type="button" data-preset="guardian" data-i18n="presetGuardian">守护者</button><button type="button" data-preset="spark" data-i18n="presetSpark">电光</button><button type="button" data-preset="shadow" data-i18n="presetShadow">暗影</button></div><div class="avatar-library"><div class="avatar-library-title"><strong data-i18n="heroLibrary">我的角色库</strong><button id="hero-new" type="button" data-i18n="newHero">新角色</button></div><div id="hero-gallery"></div></div></div><div class="avatar-controls"><label for="hero-name" data-i18n="heroName">角色名字</label><input id="hero-name" maxlength="24" placeholder="给角色起名" data-i18n-placeholder="heroNamePlaceholder" /><div id="avatar-fields"></div></div></div>
+        <div class="avatar-editor-actions"><button id="avatar-random" type="button" data-i18n="randomAvatar">随机生成</button><button id="avatar-export" type="button" data-i18n="exportAvatar">导出 PNG</button><button id="avatar-save" type="button" data-i18n="saveAvatar">保存到游戏</button></div>
+    </dialog>
+    <script type="module" src="client.js"></script>
+</body>
+</html>
